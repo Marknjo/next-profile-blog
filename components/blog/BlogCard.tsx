@@ -12,27 +12,29 @@ function BlogCard({ date, image, title, slug, excerpt }: BlogModel) {
   const imageSrc = `/images/posts/${slug}/${image}`;
   const linkUrl = `/blog/${slug}`;
   return (
-    <article className={styles.card}>
-      <Link href={linkUrl}>
-        <a>
-          <div className={styles.image}>
-            <Image
-              src={imageSrc}
-              alt={title}
-              width={300}
-              height={150}
-              layout={'responsive'}
-            />
-          </div>
-        </a>
-      </Link>
+    <li className={styles.card}>
+      <article>
+        <Link href={linkUrl}>
+          <a>
+            <div className={styles.image}>
+              <Image
+                src={imageSrc}
+                alt={title}
+                width={300}
+                height={150}
+                layout={'responsive'}
+              />
+            </div>
+          </a>
+        </Link>
 
-      <div className={styles.content}>
-        <h3>{title}</h3>
-        <time>{formattedDate}</time>
-        <p>{excerpt}</p>
-      </div>
-    </article>
+        <div className={styles.content}>
+          <h3>{title}</h3>
+          <time>{formattedDate}</time>
+          <p>{excerpt}</p>
+        </div>
+      </article>
+    </li>
   );
 }
 

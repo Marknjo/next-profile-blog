@@ -8,11 +8,11 @@ interface BlogGridProps {
 
 const BlogGrid = ({ blogs }: BlogGridProps) => {
   return (
-    <section className={styles.grid}>
+    <ul className={styles.grid}>
       {blogs.map(blog => (
         <BlogCard key={blog.slug} {...blog} />
       ))}
-    </section>
+    </ul>
   );
 };
 
