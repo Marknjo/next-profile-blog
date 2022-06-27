@@ -1,16 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import BlogModel from '../../lib/BlogModel';
 import styles from './BlogCard.module.css';
 
-interface BlogCardProps {
-  title: string;
-  excerpt: string;
-  slug: string;
-  date: string;
-  image: string;
-}
-
-function BlogCard({ date, image, title, slug, excerpt }: BlogCardProps) {
+function BlogCard({ date, image, title, slug, excerpt }: BlogModel) {
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
     month: 'short',
     year: 'numeric',

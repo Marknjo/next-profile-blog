@@ -1,18 +1,19 @@
+import BlogModel from '../../lib/BlogModel';
 import BlogCard from './BlogCard';
 import styles from './BlogGrid.module.css';
 
 interface BlogGridProps {
-  blogs: { [key: string]: any }[];
+  blogs: BlogModel[];
 }
 
-function BlogGrid({ blogs }: BlogGridProps) {
+const BlogGrid = (props: BlogGridProps) => {
   return (
     <section className={styles.grid}>
-      {blogs.map(blog => {
-        <BlogCard key={blog.id} {...blog} />;
+      {props.blogs.map(blog => {
+        <BlogCard key={blog.slug} {...blog} />;
       })}
     </section>
   );
-}
+};
 
 export default BlogGrid;
