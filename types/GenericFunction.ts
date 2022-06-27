@@ -1,3 +1,3 @@
-export interface Genericfunction {
+export interface GenericFunction {
   (...args: any[]): any;
 }

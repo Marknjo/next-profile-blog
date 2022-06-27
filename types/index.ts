@@ -1,5 +1,5 @@
 // HTML ELEMENTS
-//export * from "./ButtonAttributes";
+export * from './ButtonAttributes';
 
 /// Generics
 export * from './GenericFunction';

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Button } from '../ui';
 import styles from './Hero.module.css';
 
 function Hero() {
@@ -23,7 +24,7 @@ function Hero() {
           and Svelte Toolkit.
         </p>
         <p>Feeling like you can relate?</p>
-        <p>Let us explore.</p>
+        <Button href="/#featured">Let us explore.</Button>
       </div>
     </section>
   );
