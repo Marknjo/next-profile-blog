@@ -6,12 +6,12 @@ interface BlogGridProps {
   blogs: BlogModel[];
 }
 
-const BlogGrid = (props: BlogGridProps) => {
+const BlogGrid = ({ blogs }: BlogGridProps) => {
   return (
     <section className={styles.grid}>
-      {props.blogs.map(blog => {
-        <BlogCard key={blog.slug} {...blog} />;
-      })}
+      {blogs.map(blog => (
+        <BlogCard key={blog.slug} {...blog} />
+      ))}
     </section>
   );
 };
