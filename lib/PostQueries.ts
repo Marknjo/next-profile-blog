@@ -64,7 +64,6 @@ class PostQueries {
 
     if (this.postSlugs.length > 1) {
       /// Update posts slugs
-      this.getPosts();
 
       return this.postSlugs;
     }
@@ -75,11 +74,6 @@ class PostQueries {
   private getPostsFactory(filterIsFeatured: boolean = false) {
     if (this.postsContent.length > 1) {
       let sortedPosts = this.sortedPostsByDate();
-
-      /// update slugs
-      sortedPosts.forEach(post => {
-        this.postSlugs.push(post.slug);
-      });
 
       /// Return filtered posts
       if (filterIsFeatured) {
