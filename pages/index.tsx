@@ -16,7 +16,7 @@ const Home: NextPage<{ posts: BlogModel[] }> = ({ posts }) => {
 export default Home;
 
 export const getStaticProps: GetStaticProps = async () => {
-  const featuredPosts = QueryBlog.getPosts();
+  const featuredPosts = QueryBlog.getFeaturedPosts();
 
   return {
     props: {
