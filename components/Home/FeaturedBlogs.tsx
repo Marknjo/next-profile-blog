@@ -10,7 +10,9 @@ function FeaturedBlogs({ blogs }: FeaturedBlogsProps) {
   return (
     <section className={styles.featured}>
       <h2>Featured Articles</h2>
-      <BlogGrid blogs={blogs} />
+
+      {blogs.length === 0 && <p>No featured posts to display</p>}
+      {blogs.length > 0 && <BlogGrid blogs={blogs} />}
     </section>
   );
 }

@@ -5,6 +5,7 @@ export default class BlogModel {
     public image: string,
     public excerpt: string,
     public date: string,
-    public isFeatured: boolean = false
+    public isFeatured: boolean = false,
+    public content?: string
   ) {}
 }

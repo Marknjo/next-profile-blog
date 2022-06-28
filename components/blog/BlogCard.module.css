@@ -20,11 +20,13 @@
 
 .content {
     padding: var(--size-4);
+    color: var(--color-grey-200);
 }
 
 .content h3 {
     margin: var(--size-2) 0;
     font-size: var(--size-6);
+
 }
 
 .content time {
@@ -34,4 +36,5 @@
 
 .content p {
     line-height: var(--size-6);
+
 }
