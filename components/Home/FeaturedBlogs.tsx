@@ -8,7 +8,7 @@ interface FeaturedBlogsProps {
 
 function FeaturedBlogs({ blogs }: FeaturedBlogsProps) {
   return (
-    <section className={styles.featured}>
+    <section className={styles.featured} id="featured">
       <h2>Featured Articles</h2>
 
       {blogs.length === 0 && <p>No featured posts to display</p>}
