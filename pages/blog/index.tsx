@@ -1,7 +1,20 @@
-import type { NextPage } from 'next';
+import type { GetStaticProps, NextPage } from 'next';
+import BlogPosts from '../../components/blog/BlogPosts';
+import BlogModel from '../../lib/BlogModel';
+import QueryBlog from '../../lib/PostQueries';
 
-const Blog: NextPage = () => {
-  return <h1>All blog posts page</h1>;
+const Blog: NextPage<{ posts: BlogModel[] }> = ({ posts }) => {
+  return <BlogPosts blogs={posts} />;
 };
 
 export default Blog;
+
+export const getStaticProps: GetStaticProps = async () => {
+  const posts = QueryBlog.getPosts();
+
+  return {
+    props: {
+      posts,
+    },
+  };
+};
