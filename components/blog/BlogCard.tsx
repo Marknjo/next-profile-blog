@@ -23,6 +23,7 @@ function BlogCard({ date, image, title, slug, excerpt }: BlogModel) {
                 width={300}
                 height={150}
                 layout={'responsive'}
+                priority
               />
             </div>
           </a>
