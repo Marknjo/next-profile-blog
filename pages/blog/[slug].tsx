@@ -15,7 +15,7 @@ const Article: NextPage<{ blog: BlogModel }> = ({ blog }) => {
 export default Article;
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const slugs = QueryBlog.getSlugs();
+  const slugs = await QueryBlog.getSlugs();
 
   const params = slugs.map(slug => {
     return {
@@ -34,7 +34,7 @@ export const getStaticProps: GetStaticProps = async context => {
 
   const slug = params!.slug as string;
 
-  const foundBlog = QueryBlog.getPostBySlug(slug);
+  const foundBlog = await QueryBlog.getPostBySlug(slug);
 
   return {
     props: {

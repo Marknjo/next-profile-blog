@@ -10,7 +10,7 @@ const Blog: NextPage<{ posts: BlogModel[] }> = ({ posts }) => {
 export default Blog;
 
 export const getStaticProps: GetStaticProps = async () => {
-  const posts = QueryBlog.getPosts();
+  const posts = await QueryBlog.getPosts();
 
   return {
     props: {

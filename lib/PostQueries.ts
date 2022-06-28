@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import matter from 'gray-matter';
 import { join } from 'path';
 import BlogModel from './BlogModel';
@@ -9,10 +9,6 @@ interface GrayMatterResponse {
 }
 
 class PostQueries {
-  private postsContent: BlogModel[] = [];
-  private postFiles: string[] = [];
-  private postSlugs: string[] = [];
-
   private static initializer: PostQueries;
 
   static get instance() {
@@ -24,24 +20,23 @@ class PostQueries {
     return PostQueries.initializer;
   }
 
-  private constructor() {
-    this.findPostFiles();
-    this.mapBlogPostsMeta();
-  }
+  private constructor() {}
 
-  getPostBySlug(slug: string) {
-    if (this.postsContent.length === 0) {
+  async getPostBySlug(slug: string) {
+    const allPosts = await this.mapBlogPostsMeta();
+
+    if (allPosts.length === 0) {
       return false;
     }
 
-    if (this.postsContent.length === 1) {
-      const foundPost = this.postsContent[0];
+    if (allPosts.length === 1) {
+      const foundPost = allPosts[0];
 
       return foundPost.slug === slug ? foundPost : false;
     }
 
-    if (this.postsContent.length > 1) {
-      const foundPost = this.postsContent.find(post => post.slug === slug);
+    if (allPosts.length > 1) {
+      const foundPost = allPosts.find(post => post.slug === slug);
 
       const results = foundPost ? foundPost : false;
 
@@ -49,31 +44,29 @@ class PostQueries {
     }
   }
 
-  getPosts() {
-    return this.getPostsFactory();
+  async getPosts() {
+    return await this.getPostsFactory();
   }
 
-  getFeaturedPosts() {
-    return this.getPostsFactory(true);
+  async getFeaturedPosts() {
+    return await this.getPostsFactory(true);
   }
 
-  getSlugs() {
-    if (this.postSlugs.length === 1) {
-      return this.postSlugs;
-    }
+  async getSlugs() {
+    const postSlugs = await this.mapSlugs();
 
-    if (this.postSlugs.length > 1) {
-      /// Update posts slugs
-
-      return this.postSlugs;
+    if (postSlugs.length > 0) {
+      return postSlugs;
     }
 
     return [];
   }
 
-  private getPostsFactory(filterIsFeatured: boolean = false) {
-    if (this.postsContent.length > 1) {
-      let sortedPosts = this.sortedPostsByDate();
+  private async getPostsFactory(filterIsFeatured: boolean = false) {
+    const mappedPosts = await this.mapBlogPostsMeta();
+
+    if (mappedPosts.length > 1) {
+      let sortedPosts = this.sortedPostsByDate(mappedPosts);
 
       /// Return filtered posts
       if (filterIsFeatured) {
@@ -83,8 +76,8 @@ class PostQueries {
       return sortedPosts;
     }
 
-    if (this.postsContent.length === 1) {
-      const post = this.postsContent;
+    if (mappedPosts.length === 1) {
+      const post = mappedPosts;
 
       const results = filterIsFeatured && post[0].isFeatured ? post : post;
       return results;
@@ -93,41 +86,50 @@ class PostQueries {
     return [];
   }
 
-  private sortedPostsByDate() {
+  private sortedPostsByDate(mappedPosts: BlogModel[]) {
     const getDateByTime = (date: string) => {
       return new Date(date).getTime();
     };
 
-    return this.postsContent.sort(
+    return mappedPosts.sort(
       (postA, postB) => getDateByTime(postA.date) - getDateByTime(postB.date)
     );
   }
 
-  private findPostFiles = () => {
-    const blogPostPath = join(process.cwd(), 'blogPosts');
-    const foundBlogPosts = readdirSync(blogPostPath, 'utf-8');
+  async mapSlugs() {
+    const foundPostFiles = await this.fetchPostFiles();
+    const slugs = foundPostFiles.map(postFile => postFile.replace(/\.md$/, ''));
 
-    this.postFiles = foundBlogPosts;
-  };
+    return slugs;
+  }
 
-  private mapBlogPostsMeta = () => {
-    const blogPostPaths = this.postFiles;
+  private async fetchPostFiles() {
+    const response = await fetch('http://127.0.0.1:3000/api/blogs');
+
+    const foundPostFiles = (await response.json()) as {
+      status: string;
+      data: { posts: string[] };
+    };
+
+    return foundPostFiles.data.posts;
+  }
+
+  private async mapBlogPostsMeta() {
+    const blogPostPaths = await this.fetchPostFiles();
 
     if (blogPostPaths.length > 0) {
-      blogPostPaths.forEach(postFile => {
-        this.extractBlogContent(postFile);
-      });
+      const mappedPosts = blogPostPaths.map(postFile =>
+        this.extractBlogContent(postFile)
+      );
 
-      return;
+      return mappedPosts;
     }
-    this.postsContent = [];
-    return;
-  };
+    return [];
+  }
 
   private extractBlogContent(postFile: string) {
     // manage slug
     const slug = postFile.replace(/\.md$/, '');
-    this.postSlugs.push(slug);
 
     // create path
     const postPath = join(process.cwd(), 'blogPosts', postFile);
@@ -149,7 +151,7 @@ class PostQueries {
       content: matterContent.content,
     };
 
-    this.postsContent.push(content);
+    return content;
   }
 } // End class
 
