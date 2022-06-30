@@ -15,13 +15,12 @@ const Home: NextPage<{ posts: BlogModel[] }> = ({ posts }) => {
 
 export default Home;
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const featuredPosts = await QueryBlog.getFeaturedPosts();
 
   return {
     props: {
       posts: featuredPosts,
     },
-    revalidate: 10,
   };
 };
