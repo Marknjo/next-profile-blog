@@ -1,8 +1,8 @@
-import type { GetStaticProps, NextPage } from 'next';
+import type { GetServerSideProps, GetStaticProps, NextPage } from 'next';
 import FeaturedBlogs from '../components/Home/FeaturedBlogs';
 import Hero from '../components/Home/Hero';
 import BlogModel from '../lib/BlogModel';
-import QueryBlog from '../lib/PostQueries';
+import QueryBlog from '../lib/PostQueries.server';
 
 const Home: NextPage<{ posts: BlogModel[] }> = ({ posts }) => {
   return (
@@ -22,5 +22,6 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       posts: featuredPosts,
     },
+    revalidate: 10,
   };
 };

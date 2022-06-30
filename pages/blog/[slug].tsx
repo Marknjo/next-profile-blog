@@ -6,7 +6,7 @@ import type {
 } from 'next';
 import BlogContent from '../../components/blog/BlogContent';
 import BlogModel from '../../lib/BlogModel';
-import QueryBlog from '../../lib/PostQueries';
+import QueryBlog from '../../lib/PostQueries.server';
 
 const Article: NextPage<{ blog: BlogModel }> = ({ blog }) => {
   return <BlogContent blog={blog} />;

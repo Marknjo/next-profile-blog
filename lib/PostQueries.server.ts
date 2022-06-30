@@ -1,4 +1,5 @@
-import { readFileSync } from 'fs';
+import { constants, accessSync, readFileSync } from 'fs';
+import { readdir } from 'fs/promises';
 import matter from 'gray-matter';
 import { join } from 'path';
 import BlogModel from './BlogModel';
@@ -8,7 +9,12 @@ interface GrayMatterResponse {
   data: BlogModel;
 }
 
+let postsFiles: string[] = [];
+let fetchedPosts: BlogModel[] = [];
+
 class PostQueries {
+  blogPosts: string[] = [];
+
   private static initializer: PostQueries;
 
   static get instance() {
@@ -20,10 +26,10 @@ class PostQueries {
     return PostQueries.initializer;
   }
 
-  private constructor() {}
+  constructor() {}
 
   async getPostBySlug(slug: string) {
-    const allPosts = await this.mapBlogPostsMeta();
+    const allPosts = await this.postsFetcher();
 
     if (allPosts.length === 0) {
       return false;
@@ -63,7 +69,7 @@ class PostQueries {
   }
 
   private async getPostsFactory(filterIsFeatured: boolean = false) {
-    const mappedPosts = await this.mapBlogPostsMeta();
+    const mappedPosts = await this.postsFetcher();
 
     if (mappedPosts.length > 1) {
       let sortedPosts = this.sortedPostsByDate(mappedPosts);
@@ -97,32 +103,67 @@ class PostQueries {
   }
 
   async mapSlugs() {
-    const foundPostFiles = await this.fetchPostFiles();
+    const foundPostFiles = await this.filesFetcher();
     const slugs = foundPostFiles.map(postFile => postFile.replace(/\.md$/, ''));
 
     return slugs;
   }
 
-  private async fetchPostFiles() {
-    const response = await fetch('http://127.0.0.1:3000/api/blogs');
+  private async fetchFiles() {
+    const path = join(process.cwd(), 'blogPosts');
+    const allPost = await readdir(path, 'utf-8');
 
-    const foundPostFiles = (await response.json()) as {
-      status: string;
-      data: { posts: string[] };
-    };
-
-    return foundPostFiles.data.posts;
+    return allPost;
   }
 
-  private async mapBlogPostsMeta() {
-    const blogPostPaths = await this.fetchPostFiles();
+  private async filesFetcher() {
+    let updatesTracker: string[] = [];
+    // update global fetchFiles
+    if (postsFiles.length === 0) {
+      postsFiles = await this.fetchFiles();
+      return postsFiles;
+    }
+
+    if (postsFiles.length > 0) {
+      updatesTracker = postsFiles;
+      // async will take some time
+      postsFiles = await this.fetchFiles();
+    }
+
+    return updatesTracker;
+  }
+
+  private async postsFetcher() {
+    let updatesTracker: BlogModel[] = [];
+    // update global fetchFiles
+    if (postsFiles.length === 0) {
+      fetchedPosts = await this.buildResponse();
+      return fetchedPosts;
+    }
+
+    if (fetchedPosts.length > 0) {
+      updatesTracker = fetchedPosts;
+
+      // async will take some time
+      fetchedPosts = await this.buildResponse();
+    }
+
+    return updatesTracker;
+  }
+
+  private async buildResponse() {
+    const blogPostPaths = await this.filesFetcher();
 
     if (blogPostPaths.length > 0) {
       const mappedPosts = blogPostPaths.map(postFile =>
         this.extractBlogContent(postFile)
       );
 
-      return mappedPosts;
+      if (Object.values(mappedPosts).some(post => !post)) {
+        return mappedPosts.filter(post => !!post) as BlogModel[];
+      }
+
+      return mappedPosts as BlogModel[];
     }
     return [];
   }
@@ -132,11 +173,19 @@ class PostQueries {
     const slug = postFile.replace(/\.md$/, '');
 
     // create path
-    const postPath = join(process.cwd(), 'blogPosts', postFile);
+    const postPath = join(process.cwd(), 'blogPosts', postFile)!;
 
-    // Read file content
+    let fileExits: boolean = true;
+
+    try {
+      accessSync(postPath);
+    } catch (error) {
+      fileExits = false;
+    }
+
+    if (!fileExits) return false;
+
     const fileContent = readFileSync(postPath, 'utf-8');
-
     // extract Get Gray matter
     const matterContent: GrayMatterResponse = matter(
       fileContent
@@ -155,6 +204,7 @@ class PostQueries {
   }
 } // End class
 
-const QueryBlog = PostQueries.instance;
+// const QueryBlog = PostQueries.instance;
+const QueryBlog = new PostQueries();
 
 export default QueryBlog;
