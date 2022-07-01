@@ -20,4 +20,13 @@ function printBasics() {
 printBasics();
 ```
 
+The CSS wrapper
+
+```css showLineNumbers
+.wrapper {
+  width: 800px;
+  padding: 32px;
+}
+```
+
 Learn more about it [here](https://academind.com).

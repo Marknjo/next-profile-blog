@@ -9,6 +9,7 @@ import styles from './BlogContent.module.css';
 
 import 'prismjs/themes/prism-okaidia.min.css';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
+import BlogContentHeader from './BlogContentHeader';
 
 interface BlogContentProps {
   children: ReactNode;
@@ -59,11 +60,11 @@ const BlogContent = ({
   const Component = useMemo(() => getMDXComponent(blog), [blog]);
   const ParaComp = useMemo(() => pComponent(slug), [slug]);
 
+  const imgSrc = `/images/posts/${slug}/${frontmatter.image}`;
+
   return (
     <article className={styles.content}>
-      <header>
-        <h1>{frontmatter.title}</h1>
-      </header>
+      <BlogContentHeader title={frontmatter.title} imgSrc={imgSrc} />
 
       <Component components={{ p: ParaComp, pre: PreComponent }} />
     </article>
