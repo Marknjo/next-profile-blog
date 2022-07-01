@@ -24,3 +24,26 @@
         padding: var(--size-8);
     }
 }
+
+
+/* Line numbers */
+
+
+.code-block {
+    position: relative;
+    margin-top: 2.8rem;
+    margin-bottom: 2.8rem;
+}
+
+.langOkaidia {
+    background-color: #272822;
+    color: #f8f8f2;
+    font-family: Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;
+    display: inline-block;
+    text-transform: uppercase;
+    padding: 0.2rem 1rem 0.8rem;
+    border-radius: 0.3rem 0.3rem 0 0;
+    position: absolute;
+    top: -2rem;
+    right: 2rem;
+}

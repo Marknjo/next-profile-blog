@@ -1,7 +1,10 @@
-import { constants, accessSync, readFileSync } from 'fs';
+import { accessSync, readFileSync } from 'fs';
 import { readdir } from 'fs/promises';
 import matter from 'gray-matter';
+import { bundleMDX } from 'mdx-bundler';
 import { join } from 'path';
+import rehypePrism from 'rehype-prism-plus';
+import remarkGfm from 'remark-gfm';
 import BlogModel from './BlogModel';
 
 interface GrayMatterResponse {
@@ -29,25 +32,9 @@ class PostQueries {
   constructor() {}
 
   async getPostBySlug(slug: string) {
-    const allPosts = await this.postsFetcher();
+    const extractedContent = await this.bundleBlogContent(slug);
 
-    if (allPosts.length === 0) {
-      return false;
-    }
-
-    if (allPosts.length === 1) {
-      const foundPost = allPosts[0];
-
-      return foundPost.slug === slug ? foundPost : false;
-    }
-
-    if (allPosts.length > 1) {
-      const foundPost = allPosts.find(post => post.slug === slug);
-
-      const results = foundPost ? foundPost : false;
-
-      return results;
-    }
+    return extractedContent;
   }
 
   async getPosts() {
@@ -110,7 +97,7 @@ class PostQueries {
   }
 
   private async fetchFiles() {
-    const path = join(process.cwd(), 'blogPosts');
+    const path = join(process.cwd(), 'blogs');
     const allPost = await readdir(path, 'utf-8');
 
     return allPost;
@@ -156,7 +143,7 @@ class PostQueries {
 
     if (blogPostPaths.length > 0) {
       const mappedPosts = blogPostPaths.map(postFile =>
-        this.extractBlogContent(postFile)
+        this.extractBlogMeta(postFile)
       );
 
       if (Object.values(mappedPosts).some(post => !post)) {
@@ -168,12 +155,9 @@ class PostQueries {
     return [];
   }
 
-  private extractBlogContent(postFile: string) {
-    // manage slug
-    const slug = postFile.replace(/\.md$/, '');
-
+  private getFileContent(postFile: string) {
     // create path
-    const postPath = join(process.cwd(), 'blogPosts', postFile)!;
+    const postPath = join(process.cwd(), 'blogs', postFile)!;
 
     let fileExits: boolean = true;
 
@@ -185,7 +169,57 @@ class PostQueries {
 
     if (!fileExits) return false;
 
-    const fileContent = readFileSync(postPath, 'utf-8');
+    return readFileSync(postPath, 'utf-8');
+  }
+
+  private async bundleBlogContent(postFile: string) {
+    const fileContent = this.getFileContent(`${postFile}.md`);
+
+    if (!fileContent) return false;
+
+    // extract Get Gray matter
+    const { code, frontmatter, matter } = await bundleMDX<BlogModel>({
+      source: fileContent,
+      mdxOptions(options) {
+        options.remarkPlugins = [...(options?.remarkPlugins ?? []), remarkGfm];
+        options.rehypePlugins = [
+          ...(options?.rehypePlugins ?? []),
+          [rehypePrism],
+
+          // rehypePrism.bind(null as any, {
+          //   plugins: [
+          //     'autoloader',
+          //     'line-numbers',
+          //     'toolbar',
+          //     'line-highlight',
+          //     'copy-to-clipboard',
+          //   ],
+          // }),
+        ];
+
+        return options;
+      },
+    });
+
+    // Add slug to the data/content
+    frontmatter.slug = postFile;
+
+    return {
+      code,
+      frontmatter,
+      matter,
+    };
+  }
+
+  private extractBlogMeta(postFile: string) {
+    // manage slug
+    const slug = postFile.replace(/\.md$/, '');
+
+    /// Get file paths
+    const fileContent = this.getFileContent(postFile);
+
+    if (!fileContent) return false;
+
     // extract Get Gray matter
     const matterContent: GrayMatterResponse = matter(
       fileContent
@@ -197,7 +231,6 @@ class PostQueries {
     // Content
     const content = {
       ...matterContent.data,
-      content: matterContent.content,
     };
 
     return content;

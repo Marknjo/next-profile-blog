@@ -1,56 +1,73 @@
 import Image from 'next/image';
-import ReactMarkdown from 'react-markdown';
+import { FC, ReactNode, useMemo } from 'react';
+
 import { Prism as Highlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { getMDXComponent } from 'mdx-bundler/client';
 import BlogModel from '../../lib/BlogModel';
 import styles from './BlogContent.module.css';
 
-const BlogContent = ({ blog }: { blog: BlogModel }) => {
-  const blogContent = blog.content! as string;
+import 'prismjs/themes/prism-okaidia.min.css';
+import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 
-  const customRenderers = {
-    p(paragraph: any) {
-      const { node } = paragraph;
+interface BlogContentProps {
+  children: ReactNode;
+}
 
-      if (node.children[0].tagName === 'img') {
-        const image = node.children[0];
+const pComponent = (slug: string) => {
+  const Paragraph: FC<{ [key: string]: any }> = props => {
+    if (typeof props.children !== 'string' && props.children.type === 'img') {
+      const src = props.children.props.src;
+      const alt = props.children.props.alt;
 
-        return (
-          <div className={styles.image}>
-            <Image
-              src={`/images/posts/${blog.slug}/${image.properties.src}`}
-              alt={image.alt}
-              width={600}
-              height={300}
-            />
-          </div>
-        );
-      }
-
-      return <p>{paragraph.children}</p>;
-    },
-    code(code: any) {
-      const { className, children } = code;
-      const language = className.split('-')[1]; // className is something like language-js => We need the "js" part here
       return (
-        <Highlighter style={atomDark} language={language}>
-          {children}
-        </Highlighter>
+        <div className={styles.image}>
+          <Image
+            src={`/images/posts/${slug}/${src}`}
+            alt={alt}
+            width={600}
+            height={300}
+          />
+        </div>
       );
-    },
+    }
+    return <p {...props} />;
   };
+
+  return Paragraph;
+};
+
+const PreComponent: FC<{ [key: string]: any }> = props => {
+  console.log(props.children.props.className);
+
+  const language = props.className.split('-').at(-1);
+
+  return (
+    <div className={styles['code-block']}>
+      <div className={styles.langOkaidia}>{language}</div>
+      <pre {...props} />
+    </div>
+  );
+};
+
+const BlogContent = ({
+  blog,
+  frontmatter,
+}: {
+  blog: string;
+  frontmatter: BlogModel;
+}) => {
+  const { slug } = frontmatter;
+  const Component = useMemo(() => getMDXComponent(blog), [blog]);
+  const ParaComp = useMemo(() => pComponent(slug), [slug]);
 
   return (
     <article className={styles.content}>
       <header>
-        <p>Post heading</p>
+        <h1>{frontmatter.title}</h1>
       </header>
 
-      <div>
-        <ReactMarkdown components={customRenderers}>
-          {blogContent}
-        </ReactMarkdown>
-      </div>
+      <Component components={{ p: ParaComp, pre: PreComponent }} />
     </article>
   );
 };

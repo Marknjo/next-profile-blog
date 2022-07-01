@@ -10,7 +10,7 @@ JavaScript powers the web - it's **the** most important programming language you
 
 For example, you should understand code like this:
 
-```js
+```js showLineNumbers
 const basics = 'Okay, that should not be too difficult actually';
 
 function printBasics() {

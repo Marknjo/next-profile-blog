@@ -17,6 +17,8 @@
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.3",
     "react-syntax-highlighter": "^15.5.0",
+    "rehype-prism-plus": "^1.4.1",
+    "remark-gfm": "^3.0.1",
     "sharp": "^0.30.7"
   },
   "devDependencies": {
