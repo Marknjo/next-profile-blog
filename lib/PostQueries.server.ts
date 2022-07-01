@@ -37,6 +37,13 @@ class PostQueries {
     return extractedContent;
   }
 
+  async mapSlugs() {
+    const foundPostFiles = await this.filesFetcher();
+    const slugs = foundPostFiles.map(postFile => postFile.replace(/\.md$/, ''));
+
+    return slugs;
+  }
+
   async getPosts() {
     return await this.getPostsFactory();
   }
@@ -87,13 +94,6 @@ class PostQueries {
     return mappedPosts.sort(
       (postA, postB) => getDateByTime(postA.date) - getDateByTime(postB.date)
     );
-  }
-
-  async mapSlugs() {
-    const foundPostFiles = await this.filesFetcher();
-    const slugs = foundPostFiles.map(postFile => postFile.replace(/\.md$/, ''));
-
-    return slugs;
   }
 
   private async fetchFiles() {
@@ -155,8 +155,7 @@ class PostQueries {
     return [];
   }
 
-  private getFileContent(postFile: string) {
-    // create path
+  private checkFileExists(postFile: string) {
     const postPath = join(process.cwd(), 'blogs', postFile)!;
 
     let fileExits: boolean = true;
@@ -169,11 +168,38 @@ class PostQueries {
 
     if (!fileExits) return false;
 
-    return readFileSync(postPath, 'utf-8');
+    return postPath;
+  }
+
+  private getFileContent(postFile: string) {
+    const incomingFileExt = /\.(md|mdx)$/.test(postFile);
+
+    /// Do not proceed for files with extensions
+    if (incomingFileExt) {
+      const postPath = this.checkFileExists(postFile);
+
+      if (!postPath) return false;
+
+      return readFileSync(postPath, 'utf-8');
+    }
+
+    // Handle files without extension - either .md | .mdx
+    let postPath: string | boolean = false;
+
+    postPath = this.checkFileExists(`${postFile}.md`);
+    if (!postPath) {
+      postPath = this.checkFileExists(`${postFile}.mdx`);
+    }
+
+    if (!postPath) return false;
+
+    const content = readFileSync(postPath, 'utf-8');
+
+    return content;
   }
 
   private async bundleBlogContent(postFile: string) {
-    const fileContent = this.getFileContent(`${postFile}.md`);
+    const fileContent = this.getFileContent(postFile);
 
     if (!fileContent) return false;
 
@@ -213,7 +239,7 @@ class PostQueries {
 
   private extractBlogMeta(postFile: string) {
     // manage slug
-    const slug = postFile.replace(/\.md$/, '');
+    const slug = postFile.replace(/\.(md|mdx)$/, '');
 
     /// Get file paths
     const fileContent = this.getFileContent(postFile);

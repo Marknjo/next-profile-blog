@@ -38,8 +38,6 @@ const pComponent = (slug: string) => {
 };
 
 const PreComponent: FC<{ [key: string]: any }> = props => {
-  console.log(props.children.props.className);
-
   const language = props.className.split('-').at(-1);
 
   return (
