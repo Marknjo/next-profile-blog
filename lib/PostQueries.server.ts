@@ -137,7 +137,7 @@ class PostQueries {
     let updatesTracker: BlogModel[] = [];
     // update global fetchFiles
     if (postsFiles.length === 0) {
-      fetchedPosts = await this.buildResponse();
+      fetchedPosts = await this.transformBlogContent();
       return fetchedPosts;
     }
 
@@ -145,13 +145,13 @@ class PostQueries {
       updatesTracker = fetchedPosts;
 
       // async will take some time
-      fetchedPosts = await this.buildResponse();
+      fetchedPosts = await this.transformBlogContent();
     }
 
     return updatesTracker;
   }
 
-  private async buildResponse() {
+  private async transformBlogContent() {
     const blogPostPaths = await this.filesFetcher();
 
     if (blogPostPaths.length > 0) {

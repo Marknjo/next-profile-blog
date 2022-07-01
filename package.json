@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "esbuild": "^0.14.47",
+    "esbuild": "^0.14.48",
     "gray-matter": "^4.0.3",
     "mdx-bundler": "^9.0.1",
     "next": "12.1.6",
