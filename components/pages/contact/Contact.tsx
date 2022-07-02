@@ -19,13 +19,15 @@ const submitContactDetails = async (details: {
 
     const responseMessage = await submitResponse.json();
 
-    if (!responseMessage.ok) {
+    if (!submitResponse.ok && responseMessage.status !== 'success') {
       const message =
         responseMessage.data.message ??
-        `Submission error ${responseMessage.status}, please try later`;
+        `Submission error ${submitResponse.status}, please try later`;
 
       throw new Error(message);
     }
+
+    return responseMessage;
   } catch (error) {
     throw error;
   }
@@ -35,7 +37,7 @@ const Contact = () => {
   const [enteredName, setEnteredName] = useState('');
   const [enteredEmail, setEnteredEmail] = useState('');
   const [enteredMessage, setEnteredMessage] = useState('');
-  const [formErrors, setFormErrors] = useState('Samp error');
+  const [formErrors, setFormErrors] = useState('');
 
   useEffect(() => {
     if (formErrors) {
