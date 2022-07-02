@@ -1,6 +1,6 @@
 import type { GetServerSideProps, GetStaticProps, NextPage } from 'next';
-import FeaturedBlogs from '../components/Home/FeaturedBlogs';
-import Hero from '../components/Home/Hero';
+import FeaturedBlogs from '../components/pages/Home/FeaturedBlogs';
+import Hero from '../components/pages/Home/Hero';
 import BlogModel from '../lib/BlogModel';
 import QueryBlog from '../lib/PostQueries.server';
 
