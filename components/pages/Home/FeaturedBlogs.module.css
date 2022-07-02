@@ -1,0 +1,18 @@
+.featured {
+    width: 90%;
+    max-width: 80rem;
+    margin: var(--size-8) auto;
+}
+
+.featured h2 {
+    font-size: var(--size-8);
+    color: var(--color-grey-800);
+    text-align: center;
+    margin: var(--size-8) auto;
+}
+
+@media (min-width: 768px) {
+    .featured h2 {
+        font-size: var(--size-16);
+    }
+}
