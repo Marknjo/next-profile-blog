@@ -7,6 +7,7 @@
   padding: var(--size-4);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   font-size: var(--size-6);
+  position: relative;
 }
 
 .contact h1 {
@@ -70,4 +71,20 @@
     font-size: var(--size-16);
     text-align: center;
   }
+}
+
+.form-error {
+  background-color: rgb(255, 197, 197);
+  color: rgb(114, 18, 18);
+  padding: var(--size-4);
+  border:  rgb(114, 18, 18, 0.5);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  max-width: 25rem;
+  margin: var(--size-6) auto;
+  font-size: var(--size-4);
+
+  position: absolute;
+  top: -3.2rem;
+  right: 2rem;
 }
