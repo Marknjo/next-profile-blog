@@ -38,6 +38,7 @@ const Contact = () => {
   const [enteredEmail, setEnteredEmail] = useState('');
   const [enteredMessage, setEnteredMessage] = useState('');
   const [formErrors, setFormErrors] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (formErrors) {
@@ -50,6 +51,7 @@ const Contact = () => {
 
   const submitHandler = async (event: SyntheticEvent) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     try {
       // Validate form inputs
@@ -76,9 +78,11 @@ const Contact = () => {
       setEnteredEmail('');
       setEnteredMessage('');
       setFormErrors('');
+      setIsSubmitting(false);
     } catch (error: any) {
       // handle error cases
       setFormErrors(error.message);
+      setIsSubmitting(false);
     }
   };
 
@@ -147,7 +151,9 @@ const Contact = () => {
         </div>
 
         <div className={styles.actions}>
-          <Button type={ButtonAttributes.SUBMIT}>Send Message</Button>
+          <Button type={ButtonAttributes.SUBMIT}>
+            {isSubmitting ? 'Sending...' : 'Send Message'}
+          </Button>
         </div>
       </form>
     </section>
